@@ -1,17 +1,60 @@
 import express from "express";
 import path from "path";
+import dotenv from "dotenv";
+import { Client } from "pg";
 
 const app = express();
 
-app.get("/api", (_request, response) => {
-  response.send({ hello: "World" });
+dotenv.config();
+
+const client = new Client({
+  connectionString: process.env.PGURI,
 });
 
-app.get("/api/ingo", (_request, response) => {
-  response.send({ bestInThe: "World" });
-});
-
+client.connect();
+app.use(express.json());
 app.use(express.static(path.join(path.resolve(), "dist")));
+
+app.get("/api/users", async (_request, response) => {
+  try {
+    const { rows } = await client.query(`
+    SELECT u.name, u.id, t.slot FROM userInfo u LEFT JOIN timeSlot t ON u.timeSlot_id=t.id;
+    `);
+
+    response.json(rows);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.get("/api/schedule", async (_request, response) => {
+  try {
+    const { rows } = await client.query(`
+    SELECT * FROM timeSlot
+    `);
+
+    response.json(rows);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.get("/api/book", async (request, response) => {
+  const { timeSlot, user } = request.query;
+  console.log("timeSlot: ", timeSlot);
+  console.log("user: ", user);
+  try {
+    const data = await client.query(
+      `
+    UPDATE userInfo SET timeSlot_id=$1 WHERE id=$2;`,
+      [timeSlot, user]
+    );
+
+    response.send(data);
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 app.listen(3000, () => {
   console.log("Redo på http://localhost:3000/");
