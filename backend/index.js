@@ -18,7 +18,10 @@ app.use(express.static(path.join(path.resolve(), "dist")));
 app.get("/api/users", async (_request, response) => {
   try {
     const { rows } = await client.query(`
-    SELECT u.name, u.id, t.slot FROM userInfo u LEFT JOIN timeSlot t ON u.timeSlot_id=t.id;
+    SELECT u.userName, u.userId, t.slot, t.slotId
+    FROM userInfo u
+    LEFT JOIN timeSlot t ON u.timeSlot_id=t.slotId
+    ORDER BY u.userName ASC;
     `);
 
     response.json(rows);
@@ -46,8 +49,24 @@ app.get("/api/book", async (request, response) => {
   try {
     const data = await client.query(
       `
-    UPDATE userInfo SET timeSlot_id=$1 WHERE id=$2;`,
+    UPDATE userInfo SET timeSlot_id=$1 WHERE userId=$2;`,
       [timeSlot, user]
+    );
+
+    response.send(data);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.get("/api/unbook", async (request, response) => {
+  const { user } = request.query;
+  console.log("user: ", user);
+  try {
+    const data = await client.query(
+      `
+    UPDATE userInfo SET timeSlot_id=null WHERE userId=$1;`,
+      [user]
     );
 
     response.send(data);
