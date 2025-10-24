@@ -5,6 +5,7 @@ function App() {
 
   return (
     <>
+    <h1>Boknings Schema</h1>
       <Schedule />
     </>
   )
