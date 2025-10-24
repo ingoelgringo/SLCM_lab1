@@ -12,7 +12,6 @@ const Schedule = () => {
         .then((response) => response.json())
         .then((result) => {
           setUsers(result)
-          console.log(result)
         })
     }, [updateBookings])
 
@@ -21,7 +20,6 @@ const Schedule = () => {
         .then((response) => response.json())
         .then((result) => {
           setSchedule(result)
-          console.log(result)
         })
     }, [])
 
@@ -40,8 +38,9 @@ const Schedule = () => {
         return
     }
     if (bookedBy && bookedBy.userid !== user) {
-      console.log(bookedBy)
+
       alert(`Denna tid är redan bokad av ${bookedBy.username}!`);
+
       return;
     }
 

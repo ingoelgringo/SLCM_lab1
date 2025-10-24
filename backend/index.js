@@ -44,8 +44,7 @@ app.get("/api/schedule", async (_request, response) => {
 
 app.get("/api/book", async (request, response) => {
   const { timeSlot, user } = request.query;
-  console.log("timeSlot: ", timeSlot);
-  console.log("user: ", user);
+
   try {
     const data = await client.query(
       `
@@ -61,7 +60,7 @@ app.get("/api/book", async (request, response) => {
 
 app.get("/api/unbook", async (request, response) => {
   const { user } = request.query;
-  console.log("user: ", user);
+
   try {
     const data = await client.query(
       `
