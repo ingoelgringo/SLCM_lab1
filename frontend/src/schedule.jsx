@@ -29,7 +29,6 @@ const Schedule = () => {
       const user = users.find((u) => u.userid === selectedUser);
       setSelectedUserName(user ? user.username : null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser, users]);
 
   const chooseUser = (userid) => {
