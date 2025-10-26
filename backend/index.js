@@ -74,6 +74,38 @@ app.get("/api/unbook", async (request, response) => {
   }
 });
 
+app.delete("/api/deleteUser", async (request, response) => {
+  const { user } = request.query;
+
+  try {
+    const data = await client.query(
+      `
+    DELETE FROM userInfo WHERE userId=$1;`,
+      [user]
+    );
+
+    response.send(data);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+app.post("/api/addUser", async (request, response) => {
+  const { name } = request.body;
+
+  try {
+    const data = await client.query(
+      `
+    INSERT INTO userInfo(userName) VALUES ($1)`,
+      [name]
+    );
+
+    response.send(data);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 app.listen(3000, () => {
   console.log("Redo på http://localhost:3000/");
 });

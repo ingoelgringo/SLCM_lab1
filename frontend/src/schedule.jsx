@@ -5,6 +5,8 @@ const Schedule = () => {
   const [schedule, setSchedule] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [updateBookings, setUpdateBookings] = useState(1);
+  const [newUser, setNewUser] = useState("");
+  const [selectedUserName, setSelectedUserName] = useState("");
 
   useEffect(() => {
     fetch("/api/users")
@@ -21,6 +23,14 @@ const Schedule = () => {
         setSchedule(result);
       });
   }, []);
+
+  useEffect(() => {
+    if (users) {
+      const user = users.find((u) => u.userid === selectedUser);
+      setSelectedUserName(user ? user.username : null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUser, users]);
 
   const chooseUser = (userid) => {
     if (selectedUser === userid) {
@@ -55,8 +65,59 @@ const Schedule = () => {
       });
   };
 
+  const addUser = (newUser) => {
+    if (newUser) {
+      fetch(`/api/addUser`, {
+        body: `{ "name": "${newUser}" }`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      })
+        .then((response) => response.json())
+        .then(() => {
+          setNewUser("");
+          setUpdateBookings((prev) => prev + 1);
+        });
+      return;
+    } else return;
+  };
+
+  const deleteUser = (user) => {
+    if (user) {
+      fetch(`/api/deleteUser?user=${encodeURIComponent(selectedUser)}`, {
+        method: "DELETE",
+      })
+        .then((response) => response.json())
+        .then(() => {
+          setUpdateBookings((prev) => prev + 1);
+        });
+      return;
+    } else return;
+  };
+
   return (
     <>
+      <div>
+        <input
+          type="string"
+          placeholder="Username"
+          value={newUser}
+          onChange={(e) => {
+            setNewUser(e.target.value);
+          }}
+        />
+        <button onClick={() => addUser(newUser)}>Add user</button>
+        {selectedUserName && (
+          <button
+            onClick={() => {
+              deleteUser(selectedUser);
+            }}
+          >
+            Delete {selectedUserName}
+          </button>
+        )}
+      </div>
       {users &&
         users.map((user) => (
           <button
